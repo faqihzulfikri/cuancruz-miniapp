@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cuan Cruz - Beranda Utama</title>
+    <!-- SDK Resmi Telegram -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        /* Google Fonts untuk tampilan font modern */
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
+
+        :root {
+            --primary: #4f46e5;       /* Indigo Royal */
+            --secondary: #818cf8;     /* Indigo Light */
+            --bg: #0f172a;            /* Dark Midnight Navy */
+            --card-bg: #1e293b;       /* Card Slate */
+            --text-main: #f8fafc;     /* White/Silver */
+            --text-sub: #94a3b8;      /* Cool Gray */
+            --accent: #f59e0b;        /* Gold Poin */
+            --success: #10b981;       /* Green Rupiah */
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* HEADER & PROFIL */
+        .header-profile {
+            background: linear-gradient(180deg, rgba(79, 70, 229, 0.2) 0%, rgba(15, 23, 42, 0) 100%);
+            padding: 25px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
+        }
+
+        .user-meta h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .user-meta p {
+            margin: 2px 0 0 0;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+
+        /* WALLET CARD CARD (SALDO) */
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%);
+            margin: 0 20px 25px 20px;
+            padding: 22px;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Efek bulatan hiasan background card */
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 130px;
+            height: 130px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .balance-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .balance-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+        }
+
+        .stat-item span {
+            color: rgba(255, 255, 255, 0.6);
+            display: block;
+            font-size: 11px;
+            margin-bottom: 2px;
+        }
+
+        /* MAIN BANNER / TOMBOL UTAMA */
+        .main-action-box {
+            padding: 0 20px;
+        }
+
+        .play-banner {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px 20px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon-pulse {
+            font-size: 45px;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .play-banner h3 {
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .play-banner p {
+            margin: 0 0 20px 0;
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.5;
+        }
+
+        .btn-play {
+            background: linear-gradient(90deg, #f59e0b, #ea580c);
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4);
+            transition: transform 0.1s;
+        }
+
+        .btn-play:active {
+            transform: scale(0.97);
+        }
+
+        /* INFO TAMBAHAN */
+        .info-footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 11px;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SECTION 1: HEADER & USER PROFILE -->
+    <div class="header-profile">
+        <div class="user-info">
+            <div class="avatar" id="user-avatar">P</div>
+            <div class="user-meta">
+                <h2 id="user-name">Memuat Nama...</h2>
+                <p>ID Pemain: <span id="user-id">000000</span></p>
+            </div>
+        </div>
+        <div style="font-size: 20px;">🤖</div>
+    </div>
+
+    <!-- SECTION 2: KARTU SALDO & POIN -->
+    <div class="balance-card">
+        <div class="balance-title">Total Saldo Cuan</div>
+        <div class="balance-amount">💰 Rp <span id="text-rupiah">0</span></div>
+        
+        <div class="balance-stats">
+            <div class="stat-item">
+                <span>Poin Terkumpul</span>
+                <strong id="text-poin" style="color: var(--accent);">0 Pts</strong>
+            </div>
+            <div class="stat-item" style="text-align: right;">
+                <span>Kuis Selesai</span>
+                <strong style="color: var(--success);">0/5 Hari Ini</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: BANNER MULAI GAME -->
+    <div class="main-action-box">
+        <div class="play-banner">
+            <div class="icon-pulse">🎮</div>
+            <h3>Kuis Harian Cuan Cruz</h3>
+            <p>Jawab 5 pertanyaan kuis hari ini. Setiap jawaban benar langsung menghasilkan saldo tunai!</p>
+            <button class="btn-play" onclick="mulaiKuis()">MULAI CARI CUAN</button>
+        </div>
+    </div>
+
+    <!-- FOOTER INFORMASI -->
+    <div class="info-footer">
+        Cuan Cruz v1.0 • Didukung oleh Jaringan Aman Telegram
+    </div>
+
+    <script>
+        // Mengaktifkan Telegram Web App SDK
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Menampilkan layar penuh di Telegram HP
+
+        // Mengambil Data Asli Pengguna dari Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            
+            // Tampilkan nama depan pengguna
+            document.getElementById('user-name').innerText = user.first_name;
+            
+            // Tampilkan ID Telegram unik pengguna
+            document.getElementById('user-id').innerText = user.id;
+            
+            // Mengambil huruf pertama nama untuk dijadikan inisial avatar
+            document.getElementById('user-avatar').innerText = user.first_name.charAt(0).toUpperCase();
+        } else {
+            // Data cadangan jika dibuka lewat browser PC biasa (untuk testing)
+            document.getElementById('user-name').innerText = "Developer Mode";
+            document.getElementById('user-id').innerText = "123456";
+        }
+
+        // Fungsi ketika tombol utama diklik
+        function mulaiKuis() {
+            tg.HapticFeedback.impactOccurred('medium'); // Efek getar halus di HP (Fitur Telegram)
+            tg.showAlert("Fitur Kuis akan segera terbuka pada langkah berikutnya!");
+        }
+    </script>
+</body>
+</html>
