@@ -364,13 +364,32 @@
 
         function cekJawaban(pilihan, benar) {
             clearInterval(timerInterval);
+            
+            // 1. Ambil semua tombol opsi
+            const tombolOpsi = document.querySelectorAll('.btn-option');
+            
+            // 2. Beri warna pada jawaban (Hijau jika benar, Merah jika salah)
+            tombolOpsi.forEach((btn, index) => {
+                btn.style.pointerEvents = 'none'; // Kunci agar tidak bisa klik berkali-kali
+                if (index === benar) {
+                    btn.classList.add('correct');
+                } else if (index === pilihan) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            // 3. Tambah poin jika benar
             if (pilihan === benar) {
                 kuisState.poin += 500;
             }
-            kuisState.index++;
-            kuisState.timer = 15;
-            save();
-            renderSoal();
+
+            // 4. Beri jeda 1 detik agar pengguna bisa melihat jawaban sebelum soal baru muncul
+            setTimeout(() => {
+                kuisState.index++;
+                kuisState.timer = 15;
+                save();
+                renderSoal();
+            }, 1000);
         }
 
         function waktuHabis() {
