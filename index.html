@@ -3,277 +3,378 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cuan Cruz - Beranda Utama</title>
-    <!-- SDK Resmi Telegram -->
+    <title>Cuan Cruz - Mini App</title>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* Google Fonts untuk tampilan font modern */
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap');
-
         :root {
-            --primary: #4f46e5;       /* Indigo Royal */
-            --secondary: #818cf8;     /* Indigo Light */
-            --bg: #0f172a;            /* Dark Midnight Navy */
-            --card-bg: #1e293b;       /* Card Slate */
-            --text-main: #f8fafc;     /* White/Silver */
-            --text-sub: #94a3b8;      /* Cool Gray */
-            --accent: #f59e0b;        /* Gold Poin */
-            --success: #10b981;       /* Green Rupiah */
+            --primary: #4f46e5;       
+            --secondary: #818cf8;     
+            --bg: #0f172a;            
+            --card-bg: #1e293b;       
+            --text-main: #f8fafc;     
+            --text-sub: #94a3b8;      
+            --accent: #f59e0b;        
+            --success: #10b981; 
+            --danger: #ef4444;      
         }
 
-        * {
-            box-sizing: border-box;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        /* --- SISTEM HALAMAN --- */
+        .page { display: none; width: 100%; animation: fadeIn 0.3s ease; padding-bottom: 90px; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- STYLE BERANDA --- */
+        .header-profile { background: linear-gradient(180deg, rgba(79, 70, 229, 0.15) 0%, rgba(15, 23, 42, 0) 100%); padding: 25px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 48px; height: 48px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 20px; color: white; }
+        .user-meta h2 { margin: 0; font-size: 16px; font-weight: 700; }
+        .user-meta p { margin: 4px 0 0 0; font-size: 12px; color: var(--text-sub); display: flex; align-items: center; gap: 5px; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 0 20px; margin-bottom: 25px; }
+        .stat-card { background: var(--card-bg); padding: 18px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.03); }
+        .main-balance { grid-column: 1 / -1; background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%); }
+        .stat-title { font-size: 12px; color: var(--text-sub); display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-weight: 700; text-transform: uppercase; }
+        .main-balance .stat-title { color: rgba(255, 255, 255, 0.7); }
+        .stat-value { font-size: 22px; font-weight: 800; }
+        .main-balance .stat-value { font-size: 32px; color: white; }
+        .text-accent { color: var(--accent); } .text-success { color: var(--success); }
+        
+        .main-action-box { padding: 0 20px; }
+        .play-banner { background-color: var(--card-bg); padding: 25px 20px; border-radius: 24px; text-align: center; }
+        .play-banner h3 { margin: 15px 0 10px 0; font-size: 20px; }
+        .play-banner p { margin: 0 0 20px 0; font-size: 13px; color: var(--text-sub); line-height: 1.6; }
+        .btn-play { background: linear-gradient(90deg, #f59e0b, #ea580c); color: white; border: none; padding: 16px; width: 100%; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        /* --- STYLE KUIS --- */
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .quiz-progress { font-weight: 700; color: var(--text-sub); }
+        .quiz-score { font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 5px; }
+        .question-box { padding: 30px 20px; text-align: center; }
+        .question-text { font-size: 22px; font-weight: 800; line-height: 1.4; margin-bottom: 30px; }
+        .options-grid { display: flex; flex-direction: column; gap: 12px; padding: 0 20px; }
+        .btn-option { background: var(--card-bg); color: var(--text-main); border: 2px solid rgba(255, 255, 255, 0.1); padding: 18px; border-radius: 16px; font-size: 16px; font-weight: 700; text-align: left; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .btn-option:active { transform: scale(0.98); }
+        .btn-option.correct { background: rgba(16, 185, 129, 0.2); border-color: var(--success); color: var(--success); }
+        .btn-option.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--danger); color: var(--danger); }
+
+        /* --- NAVBAR BAWAH --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 15px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+        }
+
+        .nav-item {
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* HEADER & PROFIL */
-        .header-profile {
-            background: linear-gradient(180deg, rgba(79, 70, 229, 0.2) 0%, rgba(15, 23, 42, 0) 100%);
-            padding: 25px 20px;
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 18px;
-            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.4);
-        }
-
-        .user-meta h2 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .user-meta p {
-            margin: 2px 0 0 0;
-            font-size: 12px;
             color: var(--text-sub);
-        }
-
-        /* WALLET CARD CARD (SALDO) */
-        .balance-card {
-            background: linear-gradient(135deg, var(--primary) 0%, #312e81 100%);
-            margin: 0 20px 25px 20px;
-            padding: 22px;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Efek bulatan hiasan background card */
-        .balance-card::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 130px;
-            height: 130px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 50%;
-        }
-
-        .balance-title {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .balance-amount {
-            font-size: 32px;
-            font-weight: 800;
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .balance-stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 13px;
-        }
-
-        .stat-item span {
-            color: rgba(255, 255, 255, 0.6);
-            display: block;
             font-size: 11px;
-            margin-bottom: 2px;
-        }
-
-        /* MAIN BANNER / TOMBOL UTAMA */
-        .main-action-box {
-            padding: 0 20px;
-        }
-
-        .play-banner {
-            background-color: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 25px 20px;
-            border-radius: 24px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .icon-pulse {
-            font-size: 45px;
-            margin-bottom: 10px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .play-banner h3 {
-            margin: 0 0 8px 0;
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .play-banner p {
-            margin: 0 0 20px 0;
-            font-size: 13px;
-            color: var(--text-sub);
-            line-height: 1.5;
-        }
-
-        .btn-play {
-            background: linear-gradient(90deg, #f59e0b, #ea580c);
-            color: white;
-            border: none;
-            padding: 16px;
-            width: 100%;
-            border-radius: 16px;
-            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(234, 88, 12, 0.4);
-            transition: transform 0.1s;
+            transition: all 0.3s ease;
+            gap: 5px;
         }
 
-        .btn-play:active {
-            transform: scale(0.97);
-        }
-
-        /* INFO TAMBAHAN */
-        .info-footer {
-            margin-top: auto;
-            text-align: center;
-            padding: 30px 20px;
-            font-size: 11px;
-            color: var(--text-sub);
-        }
+        .nav-item i { font-size: 20px; transition: transform 0.2s; }
+        .nav-item.active { color: var(--primary); }
+        .nav-item.active i { transform: translateY(-3px); text-shadow: 0 4px 10px rgba(79, 70, 229, 0.4); }
     </style>
 </head>
 <body>
 
-    <!-- SECTION 1: HEADER & USER PROFILE -->
-    <div class="header-profile">
-        <div class="user-info">
-            <div class="avatar" id="user-avatar">P</div>
-            <div class="user-meta">
-                <h2 id="user-name">Memuat Nama...</h2>
-                <p>ID Pemain: <span id="user-id">000000</span></p>
+    <!-- ================= HALAMAN 1: BERANDA ================= -->
+    <div id="page-home" class="page active">
+        <div class="header-profile">
+            <div class="user-info">
+                <div class="avatar" id="user-avatar"><i class="fa-solid fa-user"></i></div>
+                <div class="user-meta">
+                    <h2 id="user-name">Memuat Nama...</h2>
+                    <p><i class="fa-solid fa-id-badge"></i> <span id="user-id">000000</span></p>
+                </div>
             </div>
         </div>
-        <div style="font-size: 20px;">🤖</div>
+
+        <div class="dashboard-grid">
+            <div class="stat-card main-balance">
+                <div class="stat-title"><i class="fa-solid fa-wallet"></i> Total Saldo Uang</div>
+                <div class="stat-value">Rp <span id="stat-rp">0</span></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fa-solid fa-coins"></i> Poin Anda</div>
+                <div class="stat-value text-accent"><span id="stat-poin">0</span> Pts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title"><i class="fa-solid fa-list-check"></i> Kuis Selesai</div>
+                <div class="stat-value text-success"><span id="stat-soal">0/30</span></div>
+            </div>
+            <div class="stat-card" style="grid-column: 1 / -1;">
+                <div class="stat-title"><i class="fa-solid fa-users"></i> Teman Referral</div>
+                <div class="stat-value"><span id="stat-ref">0</span> Orang</div>
+            </div>
+        </div>
+
+        <div class="main-action-box">
+            <div class="play-banner">
+                <i class="fa-solid fa-gamepad" style="font-size:45px; color:var(--primary);"></i>
+                <h3>Kuis Harian Cuan Cruz</h3>
+                <p>Jawab 30 soal pengetahuan umum acak. Kumpulkan poin dan tukar jadi saldo!</p>
+                <button class="btn-play" onclick="bukaMenuKuis()">
+                    <i class="fa-solid fa-play"></i> MULAI CARI CUAN
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- SECTION 2: KARTU SALDO & POIN -->
-    <div class="balance-card">
-        <div class="balance-title">Total Saldo Cuan</div>
-        <div class="balance-amount">💰 Rp <span id="text-rupiah">0</span></div>
+    <!-- ================= HALAMAN 2: KUIS ================= -->
+    <div id="page-quiz" class="page">
+        <div class="quiz-header">
+            <div class="quiz-progress">Soal <span id="current-q-num">1</span>/30</div>
+            <div class="quiz-score"><i class="fa-solid fa-coins"></i> <span id="live-score">0</span></div>
+        </div>
+
+        <div class="question-box">
+            <div class="question-text" id="question-text">Memuat pertanyaan...</div>
+        </div>
+
+        <div class="options-grid" id="options-container"></div>
+    </div>
+
+    <!-- ================= MENU NAVIGASI BAWAH ================= -->
+    <div class="bottom-nav">
+        <!-- Menu Beranda -->
+        <div class="nav-item active" id="nav-home" onclick="pindahTab('page-home', 'nav-home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Beranda</span>
+        </div>
         
-        <div class="balance-stats">
-            <div class="stat-item">
-                <span>Poin Terkumpul</span>
-                <strong id="text-poin" style="color: var(--accent);">0 Pts</strong>
-            </div>
-            <div class="stat-item" style="text-align: right;">
-                <span>Kuis Selesai</span>
-                <strong style="color: var(--success);">0/5 Hari Ini</strong>
-            </div>
+        <!-- Menu Kuis -->
+        <div class="nav-item" id="nav-quiz" onclick="bukaMenuKuis()">
+            <i class="fa-solid fa-gamepad"></i>
+            <span>Kuis</span>
+        </div>
+        
+        <!-- Menu Teman -->
+        <div class="nav-item" onclick="tampilkanPeringatan('Halaman Referral/Teman akan segera dirilis!')">
+            <i class="fa-solid fa-user-group"></i>
+            <span>Teman</span>
+        </div>
+        
+        <!-- Menu Tarik Saldo -->
+        <div class="nav-item" onclick="tampilkanPeringatan('Halaman Penarikan Saldo akan segera dirilis!')">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Tarik</span>
         </div>
     </div>
 
-    <!-- SECTION 3: BANNER MULAI GAME -->
-    <div class="main-action-box">
-        <div class="play-banner">
-            <div class="icon-pulse">🎮</div>
-            <h3>Kuis Harian Cuan Cruz</h3>
-            <p>Jawab 5 pertanyaan kuis hari ini. Setiap jawaban benar langsung menghasilkan saldo tunai!</p>
-            <button class="btn-play" onclick="mulaiKuis()">MULAI CARI CUAN</button>
-        </div>
-    </div>
-
-    <!-- FOOTER INFORMASI -->
-    <div class="info-footer">
-        Cuan Cruz v1.0 • Didukung oleh Jaringan Aman Telegram
-    </div>
-
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
     <script>
-        // Mengaktifkan Telegram Web App SDK
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Menampilkan layar penuh di Telegram HP
-
-        // Mengambil Data Asli Pengguna dari Telegram
+        tg.expand(); 
+        
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
-            
-            // Tampilkan nama depan pengguna
             document.getElementById('user-name').innerText = user.first_name;
-            
-            // Tampilkan ID Telegram unik pengguna
             document.getElementById('user-id').innerText = user.id;
-            
-            // Mengambil huruf pertama nama untuk dijadikan inisial avatar
-            document.getElementById('user-avatar').innerText = user.first_name.charAt(0).toUpperCase();
-        } else {
-            // Data cadangan jika dibuka lewat browser PC biasa (untuk testing)
-            document.getElementById('user-name').innerText = "Developer Mode";
-            document.getElementById('user-id').innerText = "123456";
+            document.getElementById('user-avatar').innerHTML = user.first_name.charAt(0).toUpperCase();
         }
 
-        // Fungsi ketika tombol utama diklik
-        function mulaiKuis() {
-            tg.HapticFeedback.impactOccurred('medium'); // Efek getar halus di HP (Fitur Telegram)
-            tg.showAlert("Fitur Kuis akan segera terbuka pada langkah berikutnya!");
+        // Fungsi pembantu agar alert tetap jalan meski dites di browser luar Telegram
+        function tampilkanPeringatan(pesan) {
+            if (tg.showAlert) {
+                tg.showAlert(pesan);
+            } else {
+                alert(pesan);
+            }
         }
+
+        const bankSoal = [
+          {"id": 1, "q": "Ibu kota Australia adalah ....", "o": ["Sydney", "Melbourne", "Canberra", "Perth"], "a": 2},
+          {"id": 2, "q": "Gunung tertinggi di Indonesia adalah ....", "o": ["Kerinci", "Semeru", "Rinjani", "Puncak Jaya"], "a": 3},
+          {"id": 3, "q": "Planet terbesar di tata surya adalah ....", "o": ["Saturnus", "Jupiter", "Mars", "Uranus"], "a": 1},
+          {"id": 4, "q": "Lambang kimia emas adalah ....", "o": ["Ag", "Fe", "Au", "Al"], "a": 2},
+          {"id": 5, "q": "Proklamasi Kemerdekaan Indonesia dibacakan pada ....", "o": ["1 Juni 1945", "17 Agustus 1945", "10 November 1945", "28 Oktober 1928"], "a": 1},
+          {"id": 6, "q": "Benua terbesar di dunia adalah ....", "o": ["Afrika", "Amerika", "Asia", "Eropa"], "a": 2},
+          {"id": 7, "q": "Presiden pertama Indonesia adalah ....", "o": ["Soeharto", "B. J. Habibie", "Soekarno", "Megawati Soekarnoputri"], "a": 2},
+          {"id": 8, "q": "Sungai terpanjang di dunia adalah ....", "o": ["Amazon", "Nil", "Yangtze", "Mississippi"], "a": 1},
+          {"id": 9, "q": "Hewan yang dikenal sebagai raja hutan adalah ....", "o": ["Harimau", "Singa", "Gajah", "Serigala"], "a": 1},
+          {"id": 10, "q": "Alat untuk mengukur suhu adalah ....", "o": ["Barometer", "Higrometer", "Termometer", "Anemometer"], "a": 2},
+          {"id": 11, "q": "Mata uang Jepang adalah ....", "o": ["Yuan", "Won", "Yen", "Baht"], "a": 2},
+          {"id": 12, "q": "Organ tubuh yang memompa darah adalah ....", "o": ["Paru-paru", "Jantung", "Ginjal", "Hati"], "a": 1},
+          {"id": 13, "q": "Negara dengan jumlah penduduk terbanyak di dunia saat ini adalah ....", "o": ["Amerika Serikat", "India", "Indonesia", "Tiongkok"], "a": 1},
+          {"id": 14, "q": "Samudra terbesar di dunia adalah ....", "o": ["Hindia", "Atlantik", "Arktik", "Pasifik"], "a": 3},
+          {"id": 15, "q": "Burung lambang Indonesia adalah ....", "o": ["Merak", "Elang Jawa", "Garuda", "Cenderawasih"], "a": 2},
+          {"id": 16, "q": "Rumus kimia air adalah ....", "o": ["CO₂", "H₂O", "O₂", "NaCl"], "a": 1},
+          {"id": 17, "q": "Planet yang paling dekat dengan Matahari adalah ....", "o": ["Venus", "Merkurius", "Bumi", "Mars"], "a": 1},
+          {"id": 18, "q": "Bendera Jepang memiliki warna dasar ....", "o": ["Merah", "Biru", "Putih", "Kuning"], "a": 2},
+          {"id": 19, "q": "Hari Sumpah Pemuda diperingati setiap ....", "o": ["21 April", "20 Mei", "28 Oktober", "10 November"], "a": 2},
+          {"id": 20, "q": "Gas yang paling banyak terdapat di atmosfer bumi adalah ....", "o": ["Oksigen", "Nitrogen", "Karbon dioksida", "Hidrogen"], "a": 1},
+          {"id": 21, "q": "Ibu kota Thailand adalah ....", "o": ["Hanoi", "Bangkok", "Manila", "Kuala Lumpur"], "a": 1},
+          {"id": 22, "q": "Alat untuk mengukur gempa bumi adalah ....", "o": ["Termometer", "Seismograf", "Mikroskop", "Barometer"], "a": 1},
+          {"id": 23, "q": "Negara asal Menara Eiffel adalah ....", "o": ["Italia", "Inggris", "Prancis", "Spanyol"], "a": 2},
+          {"id": 24, "q": "Planet yang memiliki cincin paling jelas adalah ....", "o": ["Jupiter", "Saturnus", "Uranus", "Neptunus"], "a": 1},
+          {"id": 25, "q": "Warna bendera Indonesia adalah ....", "o": ["Merah–Putih", "Merah–Biru", "Putih–Hijau", "Merah–Kuning"], "a": 0},
+          {"id": 26, "q": "Laut terluas di dunia adalah ....", "o": ["Laut Jawa", "Laut Cina Selatan", "Laut Karibia", "Laut Filipina"], "a": 3},
+          {"id": 27, "q": "Hewan mamalia terbesar di dunia adalah ....", "o": ["Gajah Afrika", "Hiu Paus", "Paus Biru", "Badak"], "a": 2},
+          {"id": 28, "q": "Mata uang Inggris adalah ....", "o": ["Euro", "Pound Sterling", "Dolar", "Franc"], "a": 1},
+          {"id": 29, "q": "Penemu lampu pijar adalah ....", "o": ["Albert Einstein", "Thomas Alva Edison", "Isaac Newton", "Nikola Tesla"], "a": 1},
+          {"id": 30, "q": "Planet yang dihuni manusia adalah ....", "o": ["Mars", "Venus", "Bumi", "Jupiter"], "a": 2},
+          {"id": 31, "q": "Benua Afrika berada di belahan ....", "o": ["Timur dan Barat", "Utara dan Selatan", "Selatan saja", "Barat saja"], "a": 1},
+          {"id": 32, "q": "Hari Kemerdekaan Indonesia diperingati setiap ....", "o": ["20 Mei", "17 Agustus", "1 Juni", "28 Oktober"], "a": 1},
+          {"id": 33, "q": "Ibukota Provinsi Jawa Barat adalah ....", "o": ["Bekasi", "Bandung", "Bogor", "Cirebon"], "a": 1},
+          {"id": 34, "q": "Bintang berada di galaksi ....", "o": ["Andromeda", "Bima Sakti", "Triangulum", "Sombrero"], "a": 1},
+          {"id": 35, "q": "Simbol unsur besi adalah ....", "o": ["Bi", "Fe", "Be", "Ba"], "a": 1},
+          {"id": 36, "q": "Alat untuk melihat benda sangat kecil adalah ....", "o": ["Teleskop", "Mikroskop", "Lup", "Periskop"], "a": 1},
+          {"id": 37, "q": "Negara yang dijuluki Negeri Sakura adalah ....", "o": ["Korea Selatan", "Jepang", "Tiongkok", "Vietnam"], "a": 1},
+          {"id": 38, "q": "Hewan yang bertelur dan menyusui adalah ....", "o": ["Kucing", "Platipus", "Kelinci", "Lumba-lumba"], "a": 1},
+          {"id": 39, "q": "Lapisan atmosfer tempat terjadinya cuaca adalah ....", "o": ["Stratosfer", "Troposfer", "Mesosfer", "Termosfer"], "a": 1},
+          {"id": 40, "q": "Negara terbesar di dunia berdasarkan luas wilayah adalah ....", "o": ["Kanada", "Rusia", "Amerika Serikat", "Tiongkok"], "a": 1},
+          {"id": 41, "q": "Planet yang disebut Planet Biru adalah ....", "o": ["Neptunus", "Uranus", "Bumi", "Venus"], "a": 2},
+          {"id": 42, "q": "Simbol kimia oksigen adalah ....", "o": ["Ox", "O", "Og", "On"], "a": 1},
+          {"id": 43, "q": "Benua Eropa dan Asia dipisahkan oleh ....", "o": ["Pegunungan Alpen", "Pegunungan Ural", "Himalaya", "Andes"], "a": 1},
+          {"id": 44, "q": "Ibu kota Malaysia adalah ....", "o": ["Johor Bahru", "Kuala Lumpur", "Penang", "Kuching"], "a": 1},
+          {"id": 45, "q": "Candi Borobudur berada di Provinsi ....", "o": ["Jawa Barat", "Jawa Timur", "Jawa Tengah", "DI Yogyakarta"], "a": 2},
+          {"id": 46, "q": "Penemu teori gravitasi adalah ....", "o": ["Galileo Galilei", "Isaac Newton", "Charles Darwin", "Michael Faraday"], "a": 1},
+          {"id": 47, "q": "Tulang terpanjang pada tubuh manusia adalah ....", "o": ["Tulang paha", "Tulang rusuk", "Tulang lengan", "Tulang belakang"], "a": 0},
+          {"id": 48, "q": "Negara yang terkenal dengan piramida Giza adalah ....", "o": ["Meksiko", "Mesir", "Peru", "Yordania"], "a": 1},
+          {"id": 49, "q": "Alat musik angklung berasal dari ....", "o": ["Bali", "Jawa Barat", "Sumatera Barat", "Jawa Tengah"], "a": 1},
+          {"id": 50, "q": "Planet yang dijuluki Planet Merah adalah ....", "o": ["Venus", "Mars", "Jupiter", "Saturnus"], "a": 1}
+        ];
+
+        let soalSesiIni = [];
+        let indexSoalSaatIni = 0;
+        let poinSementara = 0;
+        let totalPoinUser = 0; 
+        
+        let kuisAktif = false; 
+        const JUMLAH_SOAL = 30; // Kuis di-set 30 soal per sesi
+
+        let soalBenar = 0;
+        let soalSalah = 0;
+
+        function pindahTab(pageId, navId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById(navId).classList.add('active');
+        }
+
+        function bukaMenuKuis() {
+            if (kuisAktif) {
+                pindahTab('page-quiz', 'nav-quiz');
+            } else {
+                mulaiKuis();
+            }
+        }
+
+        function mulaiKuis() {
+            try { tg.HapticFeedback.impactOccurred('medium'); } catch(e){}
+            kuisAktif = true; 
+            
+            // Reset statistik sesi kuis ini
+            soalBenar = 0;
+            soalSalah = 0;
+            poinSementara = 0;
+            indexSoalSaatIni = 0;
+            
+            // Mengacak urutan 50 soal dan mengambil 30 soal pertama
+            soalSesiIni = [...bankSoal].sort(() => Math.random() - 0.5);
+            soalSesiIni = soalSesiIni.slice(0, JUMLAH_SOAL);
+            
+            document.getElementById('live-score').innerText = poinSementara;
+            
+            pindahTab('page-quiz', 'nav-quiz');
+            tampilkanSoal();
+        }
+
+        function tampilkanSoal() {
+            const dataSoal = soalSesiIni[indexSoalSaatIni];
+            document.getElementById('current-q-num').innerText = indexSoalSaatIni + 1;
+            document.getElementById('question-text').innerText = dataSoal.q;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = ''; 
+
+            dataSoal.o.forEach((opsi, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerHTML = `<span>${opsi}</span> <i class="fa-regular fa-circle"></i>`;
+                btn.onclick = () => cekJawaban(btn, index, dataSoal.a);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function cekJawaban(tombolYangDiklik, indexDipilih, indexBenar) {
+            const semuaTombol = document.querySelectorAll('.btn-option');
+            semuaTombol.forEach(btn => btn.style.pointerEvents = 'none');
+
+            if (indexDipilih === indexBenar) {
+                try { tg.HapticFeedback.notificationOccurred('success'); } catch(e){}
+                tombolYangDiklik.classList.add('correct');
+                tombolYangDiklik.innerHTML = `<span>${tombolYangDiklik.innerText}</span> <i class="fa-solid fa-circle-check"></i>`;
+                
+                soalBenar++; 
+                poinSementara += 500; 
+                document.getElementById('live-score').innerText = poinSementara;
+            } else {
+                try { tg.HapticFeedback.notificationOccurred('error'); } catch(e){}
+                tombolYangDiklik.classList.add('wrong');
+                tombolYangDiklik.innerHTML = `<span>${tombolYangDiklik.innerText}</span> <i class="fa-solid fa-circle-xmark"></i>`;
+                
+                soalSalah++; 
+                semuaTombol[indexBenar].classList.add('correct');
+                semuaTombol[indexBenar].innerHTML = `<span>${semuaTombol[indexBenar].innerText}</span> <i class="fa-solid fa-circle-check"></i>`;
+            }
+
+            setTimeout(() => {
+                indexSoalSaatIni++;
+                if (indexSoalSaatIni < soalSesiIni.length) {
+                    tampilkanSoal();
+                } else {
+                    selesaiKuis();
+                }
+            }, 1500);
+        }
+
+        function selesaiKuis() {
+            kuisAktif = false; 
+            totalPoinUser += poinSementara;
+            
+            // Tampilkan poin terbaru di dashboard
+            document.getElementById('stat-rp').innerText = totalPoinUser.toLocaleString('id-ID');
+            document.getElementById('stat-poin').innerText = totalPoinUser.toLocaleString('id-ID');
+            document.getElementById('stat-soal').innerText = `30/30`;
+            
+            // Menampilkan pop-up hasil
+            tampilkanPeringatan(`🎉 Kuis Selesai!\n\n` +
+                                `Benar: ${soalBenar}\n` +
+                                `Salah: ${soalSalah}\n` +
+                                `Poin didapat: ${poinSementara}`);
+                         
+            pindahTab('page-home', 'nav-home');
+        }
+
     </script>
 </body>
 </html>
