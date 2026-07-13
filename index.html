@@ -121,7 +121,7 @@
             <div class="user-info">
                 <div class="avatar" id="user-avatar"><i class="fa-solid fa-user"></i></div>
                 <div class="user-meta">
-                    <h2 id="user-name">Memuat Nama...</h2>
+                    <h2 id="user-name">Pengguna</h2>
                     <p><i class="fa-solid fa-id-badge"></i> <span id="user-id">000000</span></p>
                 </div>
             </div>
@@ -148,6 +148,184 @@
 
         <div class="main-action-box">
             <div class="play-banner">
+                <i class="fa-solid fa-gamepad" style="font-size:45px; color:var(--primary);"></i>
+                <h3>Kuis Harian Cuan Cruz</h3>
+                <p>Jawab 30 soal pengetahuan umum acak. Kumpulkan poin dan tukar jadi saldo!</p>
+                <button class="btn-play" onclick="bukaMenuKuis()">
+                    <i class="fa-solid fa-play"></i> MULAI CARI CUAN
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= HALAMAN 2: KUIS ================= -->
+    <div id="page-quiz" class="page">
+        <!-- Area Kuis Berjalan -->
+        <div id="quiz-active-area">
+            <div class="quiz-header">
+                <div class="quiz-progress">Soal <span id="current-q-num">1</span>/30</div>
+                <div class="quiz-timer" id="timer-box"><i class="fa-solid fa-clock"></i> <span id="timer-text">15</span>s</div>
+                <div class="quiz-score"><i class="fa-solid fa-coins"></i> <span id="live-score">0</span></div>
+            </div>
+
+            <div class="question-box">
+                <div class="question-text" id="question-text">Memuat pertanyaan...</div>
+            </div>
+
+            <div class="options-grid" id="options-container"></div>
+        </div>
+
+        <!-- Area Hasil Kuis (Tersembunyi secara default) -->
+        <div id="quiz-result-area" style="display: none;">
+            <div class="quiz-result-box">
+                <i class="fa-solid fa-circle-check result-icon"></i>
+                <h2 class="result-title">Kuis Selesai!</h2>
+                <p style="color: var(--text-sub);">Kerja bagus! Berikut adalah statistik kuis Anda sesi ini.</p>
+                
+                <div class="result-stats">
+                    <div class="stat-row">
+                        <span>Jawaban Benar</span>
+                        <span id="res-benar" class="text-success">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Jawaban Salah</span>
+                        <span id="res-salah" class="text-danger">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Total Poin Didapat</span>
+                        <span id="res-poin" class="text-accent">+0 Pts</span>
+                    </div>
+                </div>
+
+                <button class="btn-play" onclick="kembaliKeBeranda()">
+                    <i class="fa-solid fa-house"></i> KEMBALI KE BERANDA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL HTML CUSTOM ================= -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modal-title">Judul</h3>
+            <p id="modal-message">Pesan teks ada di sini.</p>
+            <button class="btn-modal" onclick="tutupModal()">Tutup</button>
+        </div>
+    </div>
+
+    <!-- ================= MENU NAVIGASI BAWAH ================= -->
+    <div class="bottom-nav">
+        <!-- Menu Beranda -->
+        <div class="nav-item active" id="nav-home" onclick="pindahTab('page-home', 'nav-home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Beranda</span>
+        </div>
+        
+        <!-- Menu Kuis -->
+        <div class="nav-item" id="nav-quiz" onclick="bukaMenuKuis()">
+            <i class="fa-solid fa-gamepad"></i>
+            <span>Kuis</span>
+        </div>
+        
+        <!-- Menu Teman -->
+        <div class="nav-item" onclick="bukaModal('Segera Hadir!', 'Fitur Teman/Referral masih dalam tahap pengembangan dan akan segera dirilis.')">
+            <i class="fa-solid fa-user-group"></i>
+            <span>Teman</span>
+        </div>
+        
+        <!-- Menu Tarik Saldo -->
+        <div class="nav-item" onclick="bukaModal('Segera Hadir!', 'Fitur Penarikan Saldo masih dalam tahap pengembangan dan akan segera dirilis.')">
+            <i class="fa-solid fa-wallet"></i>
+            <span>Tarik</span>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        let tg = null;
+
+        // BUNGKUS DENGAN TRY-CATCH AGAR TIDAK ERROR SAAT DI BROWSER BIASA
+        try {
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = window.Telegram.WebApp;
+                tg.expand(); 
+                
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    const user = tg.initDataUnsafe.user;
+                    document.getElementById('user-name').innerText = user.first_name;
+                    document.getElementById('user-id').innerText = user.id;
+                    document.getElementById('user-avatar').innerHTML = user.first_name.charAt(0).toUpperCase();
+                }
+            }
+        } catch (error) {
+            console.log("Diuji di luar Telegram, aplikasi tetap bisa berjalan.");
+        }
+
+        function bukaModal(judul, pesan) {
+            document.getElementById('modal-title').innerText = judul;
+            document.getElementById('modal-message').innerText = pesan;
+            document.getElementById('custom-modal').classList.add('active');
+        }
+
+        function tutupModal() {
+            document.getElementById('custom-modal').classList.remove('active');
+        }
+
+        const bankSoal = [
+          {"id": 1, "q": "Ibu kota Australia adalah ....", "o": ["Sydney", "Melbourne", "Canberra", "Perth"], "a": 2},
+          {"id": 2, "q": "Gunung tertinggi di Indonesia adalah ....", "o": ["Kerinci", "Semeru", "Rinjani", "Puncak Jaya"], "a": 3},
+          {"id": 3, "q": "Planet terbesar di tata surya adalah ....", "o": ["Saturnus", "Jupiter", "Mars", "Uranus"], "a": 1},
+          {"id": 4, "q": "Lambang kimia emas adalah ....", "o": ["Ag", "Fe", "Au", "Al"], "a": 2},
+          {"id": 5, "q": "Proklamasi Kemerdekaan Indonesia dibacakan pada ....", "o": ["1 Juni 1945", "17 Agustus 1945", "10 November 1945", "28 Oktober 1928"], "a": 1},
+          {"id": 6, "q": "Benua terbesar di dunia adalah ....", "o": ["Afrika", "Amerika", "Asia", "Eropa"], "a": 2},
+          {"id": 7, "q": "Presiden pertama Indonesia adalah ....", "o": ["Soeharto", "B. J. Habibie", "Soekarno", "Megawati Soekarnoputri"], "a": 2},
+          {"id": 8, "q": "Sungai terpanjang di dunia adalah ....", "o": ["Amazon", "Nil", "Yangtze", "Mississippi"], "a": 1},
+          {"id": 9, "q": "Hewan yang dikenal sebagai raja hutan adalah ....", "o": ["Harimau", "Singa", "Gajah", "Serigala"], "a": 1},
+          {"id": 10, "q": "Alat untuk mengukur suhu adalah ....", "o": ["Barometer", "Higrometer", "Termometer", "Anemometer"], "a": 2},
+          {"id": 11, "q": "Mata uang Jepang adalah ....", "o": ["Yuan", "Won", "Yen", "Baht"], "a": 2},
+          {"id": 12, "q": "Organ tubuh yang memompa darah adalah ....", "o": ["Paru-paru", "Jantung", "Ginjal", "Hati"], "a": 1},
+          {"id": 13, "q": "Negara dengan jumlah penduduk terbanyak di dunia saat ini adalah ....", "o": ["Amerika Serikat", "India", "Indonesia", "Tiongkok"], "a": 1},
+          {"id": 14, "q": "Samudra terbesar di dunia adalah ....", "o": ["Hindia", "Atlantik", "Arktik", "Pasifik"], "a": 3},
+          {"id": 15, "q": "Burung lambang Indonesia adalah ....", "o": ["Merak", "Elang Jawa", "Garuda", "Cenderawasih"], "a": 2},
+          {"id": 16, "q": "Rumus kimia air adalah ....", "o": ["CO₂", "H₂O", "O₂", "NaCl"], "a": 1},
+          {"id": 17, "q": "Planet yang paling dekat dengan Matahari adalah ....", "o": ["Venus", "Merkurius", "Bumi", "Mars"], "a": 1},
+          {"id": 18, "q": "Bendera Jepang memiliki warna dasar ....", "o": ["Merah", "Biru", "Putih", "Kuning"], "a": 2},
+          {"id": 19, "q": "Hari Sumpah Pemuda diperingati setiap ....", "o": ["21 April", "20 Mei", "28 Oktober", "10 November"], "a": 2},
+          {"id": 20, "q": "Gas yang paling banyak terdapat di atmosfer bumi adalah ....", "o": ["Oksigen", "Nitrogen", "Karbon dioksida", "Hidrogen"], "a": 1},
+          {"id": 21, "q": "Ibu kota Thailand adalah ....", "o": ["Hanoi", "Bangkok", "Manila", "Kuala Lumpur"], "a": 1},
+          {"id": 22, "q": "Alat untuk mengukur gempa bumi adalah ....", "o": ["Termometer", "Seismograf", "Mikroskop", "Barometer"], "a": 1},
+          {"id": 23, "q": "Negara asal Menara Eiffel adalah ....", "o": ["Italia", "Inggris", "Prancis", "Spanyol"], "a": 2},
+          {"id": 24, "q": "Planet yang memiliki cincin paling jelas adalah ....", "o": ["Jupiter", "Saturnus", "Uranus", "Neptunus"], "a": 1},
+          {"id": 25, "q": "Warna bendera Indonesia adalah ....", "o": ["Merah–Putih", "Merah–Biru", "Putih–Hijau", "Merah–Kuning"], "a": 0},
+          {"id": 26, "q": "Laut terluas di dunia adalah ....", "o": ["Laut Jawa", "Laut Cina Selatan", "Laut Karibia", "Laut Filipina"], "a": 3},
+          {"id": 27, "q": "Hewan mamalia terbesar di dunia adalah ....", "o": ["Gajah Afrika", "Hiu Paus", "Paus Biru", "Badak"], "a": 2},
+          {"id": 28, "q": "Mata uang Inggris adalah ....", "o": ["Euro", "Pound Sterling", "Dolar", "Franc"], "a": 1},
+          {"id": 29, "q": "Penemu lampu pijar adalah ....", "o": ["Albert Einstein", "Thomas Alva Edison", "Isaac Newton", "Nikola Tesla"], "a": 1},
+          {"id": 30, "q": "Planet yang dihuni manusia adalah ....", "o": ["Mars", "Venus", "Bumi", "Jupiter"], "a": 2}
+        ];
+
+        let soalSesiIni = [];
+        let indexSoalSaatIni = 0;
+        let poinSementara = 0;
+        let totalPoinUser = 0; 
+        
+        let kuisAktif = false; 
+        const JUMLAH_SOAL = 30;
+
+        let soalBenar = 0;
+        let soalSalah = 0;
+        
+        let timerInterval;
+        let waktuTersisa = 15;
+
+        function pindahTab(pageId, navId) {
+            clearInterval(timerInterval);
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+      er">
                 <i class="fa-solid fa-gamepad" style="font-size:45px; color:var(--primary);"></i>
                 <h3>Kuis Harian Cuan Cruz</h3>
                 <p>Jawab 30 soal pengetahuan umum acak. Kumpulkan poin dan tukar jadi saldo!</p>
